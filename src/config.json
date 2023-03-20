@@ -21,7 +21,7 @@
 		"numPlayers": 1,
 		"numEnemies": 5,
 		"numCoins": 2,
-		"minEnemyDist": 2,
+		"minEnemyDist": 5,
 		"minCoinDist": 2,
 		"wallDensity": 0.2
 	}

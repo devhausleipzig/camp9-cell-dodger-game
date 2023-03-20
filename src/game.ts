@@ -4,7 +4,6 @@ import {
 	Enemy,
 	Entity,
 	Floor,
-	GridEntity,
 	Player,
 	Stairs,
 	Wall
@@ -12,7 +11,6 @@ import {
 import { BinaryPred, Bounds2D, Coord2D } from "./types";
 import {
 	coord2DToId,
-	dist2,
 	dist2Torus,
 	mod,
 	random2DCoord,
@@ -36,7 +34,7 @@ const minDistPred: BinaryPred<Coord2D> = function (location1, location2) {
 			[gameParams.game.size, gameParams.game.size],
 			location1,
 			location2
-		) >= gameParams.game.minEnemyDist
+		) <= gameParams.game.minEnemyDist
 	);
 };
 
@@ -94,7 +92,6 @@ export class GameGrid {
 	}
 
 	reset() {
-		this.entities = [];
 		this.players = [];
 		this.enemies = [];
 		this.coins = [];
@@ -102,6 +99,15 @@ export class GameGrid {
 		this.floors = [];
 		this.doors = [];
 		this.stairs = [];
+		this.entities = [
+			this.players,
+			this.enemies,
+			this.coins,
+			this.walls,
+			this.floors,
+			this.doors,
+			this.stairs
+		];
 
 		removeChildren(this.grid);
 		this.init();
@@ -261,7 +267,7 @@ export class DodgerGame {
 
 		let allEntities: Entity<Coord2D>[] = [];
 
-		allEntities = this.gameGrid.entities.flat(2);
+		allEntities = this.gameGrid.entities.flat();
 
 		const players = this.generateEntities(
 			1,
@@ -284,7 +290,7 @@ export class DodgerGame {
 		});
 
 		this.gameGrid.players.push(...players);
-		// allEntities = this.gameGrid.entities.flat(2);
+		allEntities = this.gameGrid.entities.flat();
 
 		const enemies = this.generateEntities(
 			5,
@@ -295,7 +301,7 @@ export class DodgerGame {
 		});
 
 		this.gameGrid.enemies.push(...enemies);
-		// allEntities = this.gameGrid.entities.flat(2);
+		allEntities = this.gameGrid.entities.flat();
 
 		const coins = this.generateEntities(
 			2,
@@ -312,17 +318,18 @@ export class DodgerGame {
 		for (const [index, coin] of this.gameGrid.coins.entries()) {
 			if (collisionPred(player.position, coin.position)) {
 				console.log("COIN FOUND");
-				// // remove the coin
-				// this.gameGrid.coins.splice(index, 1);
-				// // add new coin
-				// const newCoins = this.generateEntities(
-				// 	1,
-				// 	[collisionPred],
-				// 	this.gameGrid.entities
-				// ).map((location) => {
-				// 	return new Coin(-1, location);
-				// });
-				// this.gameGrid.coins.push(...newCoins);
+				// remove the coin
+				this.gameGrid.coins.splice(index, 1);
+				// add new coin
+				const allEntities = this.gameGrid.entities.flat();
+				const newCoins = this.generateEntities(
+					1,
+					[collisionPred],
+					allEntities
+				).map((location) => {
+					return new Coin(-1, location);
+				});
+				this.gameGrid.coins.push(...newCoins);
 				this.gameState.score++;
 				this.displayScore();
 			}
@@ -463,13 +470,11 @@ export class DodgerGame {
 			);
 
 			let flag = true;
+			const entityPositions = entities.map((entity) => entity.position);
 			for (const predicate of predicates) {
 				// go over the array of all entities, for each of them execute the callback; if any of the elements in the array return true, then flag = false
 				flag =
-					flag &&
-					!entities
-						.map((entity) => entity.position)
-						.some(predicate.bind({}, location));
+					flag && !entityPositions.some(predicate.bind({}, location));
 			}
 
 			if (flag) {
