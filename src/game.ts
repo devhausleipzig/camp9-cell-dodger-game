@@ -5,6 +5,7 @@ import {
 	Entity,
 	Floor,
 	GridEntity,
+	Mushroom,
 	Player,
 	Stairs,
 	Wall
@@ -306,6 +307,16 @@ export class DodgerGame {
 		});
 
 		this.gameGrid.coins.push(...coins);
+
+		// generate Mushroom
+		const mushroom = this.generateEntities(
+			1,
+			[collisionPred, minDistPred],
+			allEntities
+		).map((location) => {
+			return new Mushroom(-1, location);
+		});
+		this.gameGrid.coins.push(...mushroom);
 	}
 
 	checkIfScored(player: Player) {

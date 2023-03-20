@@ -1,4 +1,5 @@
 import { Coord2D } from "./types";
+import { getRandomInt } from "./utils";
 
 // abstract is a TypeScript only keyword
 // public & private are Tyescript only keywords (you can create private members in JavaScript with '#')
@@ -206,6 +207,30 @@ export class Coin extends GridEntity {
 		super(colors, lifetime, weight, blocking, carryable, position, speed);
 	}
 }
+
+// 1. create a new Class Mushroom
+// 2. extend GridEntity
+export class Mushroom extends GridEntity {
+	constructor(lifetime: number, position: Coord2D) {
+		const colors = ["bg-pink-500"];
+		const weight = 0;
+		const blocking = false;
+		const carryable = true;
+		const speed = 0;
+		super(colors, lifetime, weight, blocking, carryable, position, speed);
+	}
+	// 3. generate it randomly
+	public randomDelay(): never {
+		// let randomNumber = getRandomInt(0, 20000);
+		throw new Error("Method not implemented.");
+	}
+}
+
+// 4. check if any player has mushrooms
+// 	if yes,
+// 	4.1. invert the movement of the enemies
+// 	4.2 stop the following function
+// 	4.3
 
 export class Wall extends GridEntity {
 	constructor(position: Coord2D) {
