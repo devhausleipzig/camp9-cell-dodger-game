@@ -1,0 +1,21 @@
+{
+	"controls": {
+		"movement": {
+			"left": "ArrowLeft",
+			"up": "ArrowUp",
+			"right": "ArrowRight",
+			"down": "ArrowDown"
+		}
+	},
+	"game": {
+		"delay": 300,
+		"rows": 20,
+		"columns": 20,
+		"numPlayers": 1,
+		"numEnemies": 5,
+		"numCoins": 2,
+		"minEnemyDist": 2,
+		"minCoinDist": 2,
+		"wallDensity": 0.2
+	}
+}
