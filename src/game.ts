@@ -41,7 +41,7 @@ const minDistPred: BinaryPred<Coord2D> = function (location1, location2) {
 };
 
 export class GameGrid {
-	public entities: Entity<Coord2D>[];
+	public entities: Entity<Coord2D>[][];
 	public players: Player[];
 	public enemies: Enemy[];
 	public coins: Coin[];
@@ -53,7 +53,6 @@ export class GameGrid {
 	constructor(public grid: HTMLElement, public size: number) {
 		this.size = size;
 		this.grid = grid;
-		this.entities = [];
 		this.players = [];
 		this.enemies = [];
 		this.coins = [];
@@ -61,6 +60,15 @@ export class GameGrid {
 		this.floors = [];
 		this.doors = [];
 		this.stairs = [];
+		this.entities = [
+			this.players,
+			this.enemies,
+			this.coins,
+			this.walls,
+			this.floors,
+			this.doors,
+			this.stairs
+		];
 
 		grid.style.gridTemplateRows = `repeat(${size}, 1fr)`;
 		grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
@@ -103,7 +111,8 @@ export class GameGrid {
 		removeChildren(this.grid);
 		this.init();
 
-		this.entities.forEach((entity) => {
+		const allEntities = this.entities.flat();
+		allEntities.forEach((entity) => {
 			const gridSquare = document.getElementById(
 				coord2DToId(entity.position)
 			)!;
@@ -250,10 +259,14 @@ export class DodgerGame {
 	init() {
 		this.gameGrid.init();
 
+		let allEntities: Entity<Coord2D>[] = [];
+
+		// allEntities = this.gameGrid.entities.flat(2);
+
 		const players = this.generateEntities(
 			1,
 			[collisionPred, minDistPred],
-			this.gameGrid.entities
+			allEntities
 		).map((location) => {
 			return new Player(
 				-1,
@@ -270,27 +283,29 @@ export class DodgerGame {
 			);
 		});
 
+		this.gameGrid.players.push(...players);
+		// allEntities = this.gameGrid.entities.flat(2);
+
 		const enemies = this.generateEntities(
 			5,
 			[collisionPred, minDistPred],
-			this.gameGrid.entities
+			allEntities
 		).map((location) => {
 			return new Enemy(location);
 		});
 
+		this.gameGrid.enemies.push(...enemies);
+		// allEntities = this.gameGrid.entities.flat(2);
+
 		const coins = this.generateEntities(
 			2,
 			[collisionPred, minDistPred],
-			this.gameGrid.entities
+			allEntities
 		).map((location) => {
 			return new Coin(-1, location);
 		});
 
-		this.gameGrid.players.push(...players);
-		this.gameGrid.enemies.push(...enemies);
 		this.gameGrid.coins.push(...coins);
-
-		this.gameGrid.entities.push(...players, ...enemies, ...coins);
 	}
 
 	checkIfScored(player: Player) {
