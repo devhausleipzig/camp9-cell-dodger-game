@@ -1,16 +1,23 @@
 {
 	"controls": {
-		"movement": {
-			"left": "ArrowLeft",
-			"up": "ArrowUp",
-			"right": "ArrowRight",
-			"down": "ArrowDown"
-		}
+		"movement": [
+			{
+				"left": "ArrowLeft",
+				"up": "ArrowUp",
+				"right": "ArrowRight",
+				"down": "ArrowDown"
+			},
+			{
+				"left": "a",
+				"up": "w",
+				"right": "d",
+				"down": "s"
+			}
+		]
 	},
 	"game": {
 		"delay": 300,
-		"rows": 20,
-		"columns": 20,
+		"size": 20,
 		"numPlayers": 1,
 		"numEnemies": 5,
 		"numCoins": 2,
