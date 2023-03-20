@@ -336,6 +336,15 @@ export class DodgerGame {
 		}
 	}
 
+	checkIfDead(player: Player) {
+		for (const [index, enemy] of this.gameGrid.enemies.entries()) {
+			if (collisionPred(player.position, enemy.position)) {
+				console.log("ENEMY TOUCHED");
+				this.gameState.gameOver = true;
+			}
+		}
+	}
+
 	movePlayers() {
 		type Directions = "left" | "right" | "up" | "down";
 
@@ -343,22 +352,18 @@ export class DodgerGame {
 			left: (player: Player) => {
 				const [row, column] = player.position;
 				player.position = [row, mod(column - 1, gameParams.game.size)];
-				this.checkIfScored(player);
 			},
 			right: (player: Player) => {
 				const [row, column] = player.position;
 				player.position = [row, mod(column + 1, gameParams.game.size)];
-				this.checkIfScored(player);
 			},
 			up: (player: Player) => {
 				const [row, column] = player.position;
 				player.position = [mod(row - 1, gameParams.game.size), column];
-				this.checkIfScored(player);
 			},
 			down: (player: Player) => {
 				const [row, column] = player.position;
 				player.position = [mod(row + 1, gameParams.game.size), column];
-				this.checkIfScored(player);
 			}
 		};
 
@@ -373,6 +378,7 @@ export class DodgerGame {
 
 			const moveFunc = directionActions[moveDirection];
 			moveFunc(player);
+			this.checkIfScored(player);
 			player.controls.lastKeyPressed = null;
 		}
 	}
@@ -438,6 +444,9 @@ export class DodgerGame {
 	updateGameState() {
 		this.movePlayers();
 		this.moveEnemies();
+		for (const player of this.gameGrid.players) {
+			this.checkIfDead(player);
+		}
 	}
 
 	gameLoop() {
