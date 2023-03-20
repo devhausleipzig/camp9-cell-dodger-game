@@ -19,7 +19,7 @@ export interface Entity<L> {
 	revive(): never;
 	destroy(): never;
 	sound(): never;
-	move<L>(): never;
+	move<L>(): void;
 }
 
 export interface DynamicEntity<L> extends Entity<L> {
@@ -81,7 +81,7 @@ export abstract class GridEntity implements Entity<Coord2D> {
 		throw new Error("Method not implemented.");
 	}
 
-	public move(): never {
+	public move(): void {
 		throw new Error("Method not implemented.");
 	}
 }
@@ -102,7 +102,7 @@ export abstract class DynamicGridEntity
 		super(colors, lifetime, weight, blocking, carryable, position, speed);
 	}
 
-	public move(): never {
+	public move(): void {
 		throw new Error("Method not implemented.");
 	}
 
@@ -151,7 +151,7 @@ export type Controls = {
 };
 
 export class Player extends SentientGridEntity<Player, Coord2D> {
-	public controls: Record<string, string>;
+	public controls: Controls;
 
 	constructor(
 		lifetime: number,
@@ -161,7 +161,7 @@ export class Player extends SentientGridEntity<Player, Coord2D> {
 		position: Coord2D,
 		speed: number,
 		languages: Record<string, number>,
-		controls: Record<string, string>
+		controls: Controls
 	) {
 		const colors = ["bg-blue-500"];
 
