@@ -121,7 +121,9 @@ export class GameGrid {
 	}
 
 	public getEntitiesAt(position: Coord2D): Entity<Coord2D>[] {
-		return this.entities.filter((entity) => {
+		const allEntities = this.entities.flat();
+
+		return allEntities.filter((entity) => {
 			const [row1, column1] = entity.position;
 			const [row2, column2] = position;
 
@@ -209,8 +211,6 @@ export class Settings {
 	// updateInput(noEnemiesInput, "numEnemies");
 	// updateInput(defaultDelayInput, "delay");
 }
-
-class A {}
 
 type GameState = {
 	score: number;
