@@ -261,7 +261,7 @@ export class DodgerGame {
 
 		let allEntities: Entity<Coord2D>[] = [];
 
-		// allEntities = this.gameGrid.entities.flat(2);
+		allEntities = this.gameGrid.entities.flat(2);
 
 		const players = this.generateEntities(
 			1,
@@ -458,8 +458,8 @@ export class DodgerGame {
 
 		while (newLocations.length < quantity) {
 			const location = random2DCoord(
-				[1, this.gameGrid.size],
-				[1, this.gameGrid.size]
+				[0, this.gameGrid.size - 1],
+				[0, this.gameGrid.size - 1]
 			);
 
 			let flag = true;
