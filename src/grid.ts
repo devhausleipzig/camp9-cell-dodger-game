@@ -35,6 +35,7 @@ export class GameGrid {
 		this.doors = [];
 		this.stairs = [];
 		this.entities = [
+			this.fires,
 			this.players,
 			this.enemies,
 			this.coins,

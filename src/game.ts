@@ -186,7 +186,7 @@ export class DodgerGame {
 			if (collisionPred(player.position, fire.position)) {
 				console.log("Fire FIND");
 				// remove the coin
-				this.gameGrid.fires.splice(index, 1);
+				//this.gameGrid.fires.splice(index, 1);
 			}
 		}
 		// check if player is on a mushroom
