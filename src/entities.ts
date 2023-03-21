@@ -205,25 +205,24 @@ export class Coin extends GridEntity {
 	}
 }
 
-// 1. create a new Class Mushroom
+// 1. create a new Class Strawberry
 // 2. extend GridEntity
-export class Mushroom extends GridEntity {
-	constructor(lifetime: number, position: Coord2D) {
-		const colors = ["bg-pink-500"];
-		const weight = 0;
-		const blocking = false;
-		const carryable = true;
-		const speed = 0;
-		super(colors, lifetime, weight, blocking, carryable, position, speed);
-	}
-	// 3. generate it randomly
-	public randomDelay(): never {
-		// let randomNumber = getRandomInt(0, 20000);
-		throw new Error("Method not implemented.");
+export class Strawberry extends GridEntity {
+	static default = {
+		styles: ["bg-pink-500"],
+		lifetime: -1,
+		weight: 0,
+		blocking: false,
+		carryable: true,
+		speed: 0
+	};
+
+	constructor(args: GridEntityArgs) {
+		super({ ...args });
 	}
 }
 
-// 4. check if any player has mushrooms
+// 4. check if any player has Strawberries
 // 	if yes,
 // 	4.1. invert the movement of the enemies
 // 	4.2 stop the following function

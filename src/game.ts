@@ -6,7 +6,7 @@ import {
 	Entity,
 	Floor,
 	GridEntity,
-	Mushroom,
+	Strawberry,
 	Player,
 	Stairs,
 	Wall
@@ -175,15 +175,13 @@ export class DodgerGame {
 
 		this.gameGrid.coins.push(...coins);
 
-		// generate Mushroom
-		const mushroom = this.generateEntities(
+		// generate Strawberry
+		const strawberry = this.gameGrid.generateLocations(
 			1,
-			[collisionPred, minDistPred],
-			allEntities
-		).map((location) => {
-			return new Mushroom(-1, location);
+			[collisionPred, minDistPred]).map((position) => {
+			return new Strawberry({ ...Strawberry.default, position });
 		});
-		this.gameGrid.coins.push(...mushroom);
+		this.gameGrid.coins.push(...strawberry);
 	}
 
 	checkIfScored(player: Player) {
@@ -311,7 +309,7 @@ export class DodgerGame {
 		for (const player of this.gameGrid.players) {
 			const moveKey = player.controls.lastKeyPressed;
 			if (moveKey === null) {
-				continue;
+				continue;	
 			}
 
 			type Directions = keyof typeof player.controls.movement;
