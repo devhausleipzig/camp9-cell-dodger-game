@@ -1,4 +1,4 @@
-import { Coin, Enemy, Entity, Speed, Player, Wall } from "./entities";
+import { Coin, Enemy, Entity, Fire, Player, Wall } from "./entities";
 import { BinaryPred, Coord2D } from "./types";
 import { coord2DToId, dist2Torus, mod, vecSub2Torus } from "./utils";
 import gameConfig from "./config.json";
@@ -62,7 +62,7 @@ export class Settings {
 type GameState = {
 	score: number;
 	delay: number;
-	numSpeeds: number;
+	numFires: number;
 	numCoins: number;
 	numEnemies: number;
 	gameStarted: boolean;
@@ -109,7 +109,7 @@ export class DodgerGame {
 			score: 0,
 			delay: 300,
 			numCoins: 2,
-			numSpeeds: 1,
+			numFires: 1,
 			numEnemies: 5,
 			gameStarted: false,
 			gameOver: false
@@ -155,8 +155,16 @@ export class DodgerGame {
 			.map((position) => {
 				return new Coin({ ...Coin.default, position });
 			});
-
+			
 		this.gameGrid.coins.push(...coins);
+
+
+		const fires = this.gameGrid
+			.generateLocations(1, [collisionPred, minDistPred])
+			.map((position) => {
+				return new Fire({ ...Fire.default, position });
+			});
+		this.gameGrid.fires.push(...fires);
 
 		this.gameGrid.render();
 
@@ -173,12 +181,12 @@ export class DodgerGame {
 		// if it is, then make enemies run away from player
 	}
 
-	checkIfSpeeded(player: Player) {
-		for (const [index, speed] of this.gameGrid.speeds.entries()) {
-			if (collisionPred(player.position, speed.position)) {
-				console.log("SPEED FIND");
+	checkIfFired(player: Player) {
+		for (const [index, fire] of this.gameGrid.fires.entries()) {
+			if (collisionPred(player.position, fire.position)) {
+				console.log("Fire FIND");
 				// remove the coin
-				this.gameGrid.speeds.splice(index, 1);
+				this.gameGrid.fires.splice(index, 1);
 			}
 		}
 		// check if player is on a mushroom

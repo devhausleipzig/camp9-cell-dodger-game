@@ -202,7 +202,7 @@ export class Coin extends GridEntity {
 	}
 }
 
-export class Speed extends GridEntity {
+export class Fire extends GridEntity {
 	static default = {
 		styles: ["bg-green-500"],
 		lifetime: -1,

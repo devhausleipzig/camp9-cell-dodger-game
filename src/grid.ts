@@ -7,7 +7,7 @@ import {
 	Player,
 	Stairs,
 	Wall,
-	Speed
+	Fire
 } from "./entities";
 import { BinaryPred, Bounds2D, Coord2D } from "./types";
 import { coord2DToId, random2DCoord, removeChildren } from "./utils";
@@ -17,7 +17,7 @@ export class GameGrid {
 	public players: Player[];
 	public enemies: Enemy[];
 	public coins: Coin[];
-	public speeds: Speed[];
+	public fires: Fire[];
 	public walls: Wall[];
 	public floors: Floor[];
 	public doors: Door[];
@@ -29,7 +29,7 @@ export class GameGrid {
 		this.players = [];
 		this.enemies = [];
 		this.coins = [];
-		this.speeds = [];
+		this.fires = [];
 		this.walls = [];
 		this.floors = [];
 		this.doors = [];
@@ -68,6 +68,7 @@ export class GameGrid {
 	}
 
 	reset() {
+		this.fires = [];
 		this.players = [];
 		this.enemies = [];
 		this.coins = [];
@@ -76,6 +77,7 @@ export class GameGrid {
 		this.doors = [];
 		this.stairs = [];
 		this.entities = [
+			this.fires,
 			this.players,
 			this.enemies,
 			this.coins,
