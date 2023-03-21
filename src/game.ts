@@ -1,4 +1,4 @@
-import { Coin, Enemy, Entity, Player, Wall } from "./entities";
+import { Coin, Enemy, Entity, Speed, Player, Wall } from "./entities";
 import { BinaryPred, Coord2D } from "./types";
 import { coord2DToId, dist2Torus, mod, vecSub2Torus } from "./utils";
 import gameConfig from "./config.json";
@@ -62,6 +62,7 @@ export class Settings {
 type GameState = {
 	score: number;
 	delay: number;
+	numSpeeds: number;
 	numCoins: number;
 	numEnemies: number;
 	gameStarted: boolean;
@@ -108,6 +109,7 @@ export class DodgerGame {
 			score: 0,
 			delay: 300,
 			numCoins: 2,
+			numSpeeds: 1,
 			numEnemies: 5,
 			gameStarted: false,
 			gameOver: false
@@ -171,7 +173,14 @@ export class DodgerGame {
 		// if it is, then make enemies run away from player
 	}
 
-	checkIfMushroomed(player: Player) {
+	checkIfSpeeded(player: Player) {
+		for (const [index, speed] of this.gameGrid.speeds.entries()) {
+			if (collisionPred(player.position, speed.position)) {
+				console.log("SPEED FIND");
+				// remove the coin
+				this.gameGrid.speeds.splice(index, 1);
+			}
+		}
 		// check if player is on a mushroom
 		// if it is, then decrease the game loop delay & decrease the enemy speed
 	}

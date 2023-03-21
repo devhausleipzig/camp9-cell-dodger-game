@@ -202,9 +202,9 @@ export class Coin extends GridEntity {
 	}
 }
 
-export class Mushroom extends GridEntity {
+export class Speed extends GridEntity {
 	static default = {
-		styles: ["bg-yellow-500"],
+		styles: ["bg-green-500"],
 		lifetime: -1,
 		weight: 0,
 		blocking: false,
