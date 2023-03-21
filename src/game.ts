@@ -187,6 +187,9 @@ export class DodgerGame {
 				console.log("Fire FouND");
 				// remove the fire
 				this.gameGrid.fires.splice(index, 1);
+				//fire icon should go in playerposition
+				const playerOnFire=["bg-[url('/images/Fire.png')]", "bg-blue-500","bg-contain" ,"bg-no-repeat"]
+				player.styles= playerOnFire;
 			}
 		}
 		//check if player is on a mushroom
