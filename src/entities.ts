@@ -1,146 +1,146 @@
+import { collisionPred } from "./game";
 import { Coord2D } from "./types";
 
 // abstract is a TypeScript only keyword
-// public & private are Tyescript only keywords (you can create private members in JavaScript with '#')
+// public & private are Typescript only keywords (you can create private members in JavaScript with '#')
 // in JavaScript, a class can only extend from/inherit from one other class
 // however, an interface can extend from multiple interfaces
 // in REAL OOP languages, a class can extend from multiple classes
 // we can simulate this in TypeScript by using interfaces & abstract classes together
 
 export interface Entity<L> {
-	colors: string[];
+	styles: string[];
 	lifetime: number;
 	weight: number;
 	blocking: boolean;
 	carryable: boolean;
 	position: L;
-	age(): never;
-	die(): never;
-	revive(): never;
-	destroy(): never;
-	sound(): never;
-	move<L>(): void;
+	age(): void;
+	die(): void;
+	revive(): void;
+	destroy(): void;
+	sound(): void;
+	move(callback: (position: L) => L): void;
 }
 
 export interface DynamicEntity<L> extends Entity<L> {
-	interact(entity: Entity<L>): never;
-	attack(locations: L[]): never;
-	carry(entity: Entity<L>): never;
-	place(entity: Entity<L>): never;
+	interact(entity: Entity<L>): void;
+	attack(locations: L[]): void;
+	carry(entity: Entity<L>): void;
+	place(entity: Entity<L>): void;
 }
 
 export interface SentientEntity<L> extends Entity<L> {
 	communicationModes: Record<string, number>;
-	converse(entities: SentientEntity<L>[]): never;
+	converse(entities: SentientEntity<L>[]): void;
 }
 
+type GridEntityArgs = {
+	styles: string[];
+	lifetime: number;
+	weight: number;
+	blocking: boolean;
+	carryable: boolean;
+	position: Coord2D;
+	speed: number;
+};
+
 export abstract class GridEntity implements Entity<Coord2D> {
-	public colors: string[];
+	public styles: string[];
 	public lifetime: number;
 	public weight: number;
 	public blocking: boolean;
 	public carryable: boolean;
-	public position: Coord2D;
 	public speed: number;
+	private _position: Coord2D;
 
-	constructor(
-		colors: string[],
-		lifetime: number,
-		weight: number,
-		blocking: boolean,
-		carryable: boolean,
-		position: Coord2D,
-		speed: number
-	) {
-		this.colors = colors;
-		this.lifetime = lifetime;
-		this.weight = weight;
-		this.blocking = blocking;
-		this.carryable = carryable;
-		this.position = position;
-		this.speed = speed;
+	constructor(args: GridEntityArgs) {
+		this.styles = args.styles;
+		this.lifetime = args.lifetime;
+		this.weight = args.weight;
+		this.blocking = args.blocking;
+		this.carryable = args.carryable;
+		this.speed = args.speed;
+		this._position = args.position;
 	}
 
-	public age(): never {
+	public age() {
 		throw new Error("Method not implemented.");
 	}
 
-	public die(): never {
+	public die() {
 		throw new Error("Method not implemented.");
 	}
 
-	public revive(): never {
+	public revive() {
 		throw new Error("Method not implemented.");
 	}
 
-	public destroy(): never {
+	public destroy() {
 		throw new Error("Method not implemented.");
 	}
 
-	public sound(): never {
+	public sound() {
 		throw new Error("Method not implemented.");
 	}
 
-	public move(): void {
-		throw new Error("Method not implemented.");
+	public get position() {
+		return this._position;
+	}
+
+	public move(callback: (position: Coord2D) => Coord2D): void {
+		if (Math.random() < this.speed) {
+			this._position = callback(this.position);
+		}
+	}
+
+	public teleport(position: Coord2D, entityPositions: Coord2D[]): void {
+		if (!entityPositions.some(collisionPred.bind({}, position))) {
+			this._position = position;
+		}
 	}
 }
+
+type DynamicGridEntityArgs = GridEntityArgs & {};
 
 export abstract class DynamicGridEntity
 	extends GridEntity
 	implements DynamicEntity<Coord2D>
 {
-	constructor(
-		colors: string[],
-		lifetime: number,
-		weight: number,
-		blocking: boolean,
-		carryable: boolean,
-		position: Coord2D,
-		speed: number
-	) {
-		super(colors, lifetime, weight, blocking, carryable, position, speed);
+	constructor(args: DynamicGridEntityArgs) {
+		super({ ...args });
 	}
 
-	public move(): void {
+	public interact(entity: Entity<Coord2D>): void {
 		throw new Error("Method not implemented.");
 	}
 
-	public interact(entity: Entity<Coord2D>): never {
+	public attack(locations: Coord2D[]): void {
 		throw new Error("Method not implemented.");
 	}
 
-	public attack(locations: Coord2D[]): never {
+	public carry(entity: Entity<Coord2D>): void {
 		throw new Error("Method not implemented.");
 	}
 
-	public carry(entity: Entity<Coord2D>): never {
-		throw new Error("Method not implemented.");
-	}
-
-	public place(entity: Entity<Coord2D>): never {
+	public place(entity: Entity<Coord2D>): void {
 		throw new Error("Method not implemented.");
 	}
 }
 
-export abstract class SentientGridEntity<S, L> extends DynamicGridEntity {
+type SentientGridEntityArgs = DynamicGridEntityArgs & {
+	languages: Record<string, number>;
+};
+
+export abstract class SentientGridEntity<S> extends DynamicGridEntity {
 	public languages: Record<string, number>;
 
-	constructor(
-		colors: string[],
-		lifetime: number,
-		weight: number,
-		blocking: boolean,
-		carryable: boolean,
-		position: Coord2D,
-		speed: number,
-		languages: Record<string, number>
-	) {
-		super(colors, lifetime, weight, blocking, carryable, position, speed);
-		this.languages = languages;
+	constructor(args: SentientGridEntityArgs) {
+		super({ ...args });
+		this.languages = args.languages;
 	}
 
-	public converse(entities: S): never {
+	public converse(entities: S): void {
 		throw new Error("Method not implemented.");
 	}
 }
@@ -150,112 +150,129 @@ export type Controls = {
 	movement: { left: string; up: string; right: string; down: string };
 };
 
-export class Player extends SentientGridEntity<Player, Coord2D> {
+export class Player extends SentientGridEntity<Player> {
+	static default = {
+		styles: ["bg-blue-500"],
+		lifetime: -1,
+		weight: 100,
+		blocking: false,
+		carryable: false,
+		speed: 1,
+		languages: {}
+	};
+
 	public controls: Controls;
 
-	constructor(
-		lifetime: number,
-		weight: number,
-		blocking: boolean,
-		carryable: boolean,
-		position: Coord2D,
-		speed: number,
-		languages: Record<string, number>,
-		controls: Controls
-	) {
-		const colors = ["bg-blue-500"];
+	constructor(args: SentientGridEntityArgs & { controls: Controls }) {
+		super({
+			...args
+		});
 
-		super(
-			colors,
-			lifetime,
-			weight,
-			blocking,
-			carryable,
-			position,
-			speed,
-			languages
-		);
-
-		this.controls = controls;
-	}
-
-	public move(): void {
-		// move player
+		this.controls = args.controls;
 	}
 }
 
 export class Enemy extends DynamicGridEntity {
-	constructor(position: Coord2D) {
-		const colors = ["bg-red-500"];
-		const lifetime = -1;
-		const weight = 1000;
-		const blocking = true;
-		const carryable = false;
-		const speed = 0.5;
-		super(colors, lifetime, weight, blocking, carryable, position, speed);
+	static default = {
+		styles: ["bg-red-500"],
+		lifetime: -1,
+		weight: 1000,
+		blocking: true,
+		carryable: false,
+		speed: 0.5
+	};
+
+	constructor(args: DynamicGridEntityArgs) {
+		super({
+			...args
+		});
 	}
 }
 
 export class Coin extends GridEntity {
-	constructor(lifetime: number, position: Coord2D) {
-		const colors = ["bg-yellow-500"];
-		const weight = 0;
-		const blocking = false;
-		const carryable = true;
-		const speed = 0;
-		super(colors, lifetime, weight, blocking, carryable, position, speed);
+	static default = {
+		styles: ["bg-yellow-500"],
+		lifetime: -1,
+		weight: 0,
+		blocking: false,
+		carryable: true,
+		speed: 0
+	};
+
+	constructor(args: GridEntityArgs) {
+		super({ ...args });
 	}
 }
 
 export class Wall extends GridEntity {
-	constructor(position: Coord2D) {
-		const colors = ["bg-black"];
-		const lifetime = -1;
-		const weight = -1;
-		const blocking = true;
-		const carryable = false;
-		const speed = 0;
-		super(colors, lifetime, weight, blocking, carryable, position, speed);
+	static readonly default = {
+		styles: ["bg-black"],
+		lifetime: -1,
+		weight: -1,
+		blocking: true,
+		carryable: false,
+		speed: 0
+	};
+
+	constructor(args: GridEntityArgs) {
+		super({ ...args });
 	}
 }
 
 export class Floor extends GridEntity {
-	constructor(position: Coord2D) {
-		const colors = ["bg-zinc-300"];
-		const lifetime = -1;
-		const weight = -1;
-		const blocking = false;
-		const carryable = false;
-		const speed = -1;
-		super(colors, lifetime, weight, blocking, carryable, position, speed);
+	static readonly default = {
+		styles: ["bg-zinc-300"],
+		lifetime: -1,
+		weight: -1,
+		blocking: false,
+		carryable: false,
+		speed: -1
+	};
+
+	constructor(args: GridEntityArgs) {
+		super({ ...args });
 	}
 }
 
 export class Door extends GridEntity {
-	constructor(position: Coord2D) {
-		const colors = ["bg-amber-800"];
-		const lifetime = -1;
-		const weight = -1;
-		const blocking = true;
-		const carryable = false;
-		const speed = -1;
-		super(colors, lifetime, weight, blocking, carryable, position, speed);
+	static readonly default = {
+		styles: ["bg-amber-800"],
+		lifetime: -1,
+		weight: -1,
+		blocking: true,
+		carryable: false,
+		speed: -1
+	};
+
+	private _prevStyles: string[] = [];
+
+	constructor(args: GridEntityArgs) {
+		super({ ...args });
 	}
 
 	public open(): void {
 		this.blocking = false;
-		this.colors = ["bg-gradient-to-r", "from-amber-800", "to-gray-100"];
+		this._prevStyles = this.styles;
+		this.styles = ["bg-gradient-to-r", "from-amber-800", "to-gray-100"];
+	}
+
+	public close(): void {
+		this.blocking = true;
+		this.styles = this._prevStyles;
 	}
 }
 
 export class Stairs extends GridEntity {
-	constructor(position: Coord2D) {
-		const colors = ["bg-gray-100"];
-		const lifetime = -1;
-		const weight = -1;
-		const blocking = false;
-		const carryable = false;
-		const speed = -1;
-		super(colors, lifetime, weight, blocking, carryable, position, speed);
+	static readonly default = {
+		styles: ["bg-gray-100"],
+		lifetime: -1,
+		weight: -1,
+		blocking: false,
+		carryable: false,
+		speed: -1
+	};
+
+	constructor(args: GridEntityArgs) {
+		super({ ...args });
 	}
 }
