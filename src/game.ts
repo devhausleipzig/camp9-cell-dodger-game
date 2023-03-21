@@ -120,7 +120,7 @@ export class DodgerGame {
 		this.gameGrid.init();
 
 		const walls = this.gameGrid
-			.generateLocations(15, [collisionPred])
+			.generateLocations(5, [collisionPred])
 			.map((position) => {
 				return new Wall({ ...Wall.default, position });
 			});
@@ -160,7 +160,7 @@ export class DodgerGame {
 
 
 		const fires = this.gameGrid
-			.generateLocations(1, [collisionPred, minDistPred])
+			.generateLocations(0, [collisionPred, minDistPred])
 			.map((position) => {
 				return new Fire({ ...Fire.default, position });
 			});
@@ -184,13 +184,13 @@ export class DodgerGame {
 	checkIfFired(player: Player) {
 		for (const [index, fire] of this.gameGrid.fires.entries()) {
 			if (collisionPred(player.position, fire.position)) {
-				console.log("Fire FIND");
-				// remove the coin
-				//this.gameGrid.fires.splice(index, 1);
+				console.log("Fire FouND");
+				// remove the fire
+				this.gameGrid.fires.splice(index, 1);
 			}
 		}
-		// check if player is on a mushroom
-		// if it is, then decrease the game loop delay & decrease the enemy speed
+		//check if player is on a mushroom
+		//if it is, then decrease the game loop delay & decrease the enemy speed
 	}
 
 	checkIfScored(player: Player) {
@@ -205,10 +205,22 @@ export class DodgerGame {
 					.map((position) => {
 						return new Coin({ ...Coin.default, position });
 					});
+
 				this.gameGrid.coins.push(...newCoins);
 				this.gameState.score++;
 				this.displayScore();
+
+				if (this.gameState.score % 2 == 0) {
+					const newFire = this.gameGrid
+						.generateLocations(1, [collisionPred])
+						.map((position) => {
+							return new Fire({ ...Fire.default, position });
+						});
+						this.gameGrid.fires.push(...newFire);
+				}
 			}
+
+		
 		}
 	}
 
@@ -344,6 +356,7 @@ export class DodgerGame {
 
 			directionActions[moveDirection](player);
 			this.checkIfScored(player);
+			this.checkIfFired(player);
 			// this.checkIfMushroomed(player);
 			// this.checkIfStrawberryed(player);
 			player.controls.lastKeyPressed = null;
