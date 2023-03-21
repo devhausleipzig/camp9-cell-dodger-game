@@ -1,6 +1,12 @@
-import { Coin, Enemy, Entity, Player, Wall } from "./entities";
+import { Coin, Enemy, Entity, Player, Strawberry, Wall } from "./entities";
 import { BinaryPred, Coord2D } from "./types";
-import { coord2DToId, dist2Torus, mod, vecSub2Torus } from "./utils";
+import {
+	coord2DToId,
+	dist2Torus,
+	getRandomInt,
+	mod,
+	vecSub2Torus
+} from "./utils";
 import gameConfig from "./config.json";
 import _ from "lodash";
 import gameParams from "./config.json";
@@ -66,7 +72,8 @@ type GameState = {
 	numEnemies: number;
 	gameStarted: boolean;
 	gameOver: boolean;
-	// reversedEnemies: boolean;
+	reversedEnemies: boolean;
+	strawberryTime: number;
 };
 
 export class DodgerGame {
@@ -110,7 +117,9 @@ export class DodgerGame {
 			numCoins: 2,
 			numEnemies: 5,
 			gameStarted: false,
-			gameOver: false
+			gameOver: false,
+			reversedEnemies: false,
+			strawberryTime: 0
 		};
 	}
 
@@ -118,7 +127,7 @@ export class DodgerGame {
 		this.gameGrid.init();
 
 		const walls = this.gameGrid
-			.generateLocations(15, [collisionPred])
+			.generateLocations(1, [collisionPred])
 			.map((position) => {
 				return new Wall({ ...Wall.default, position });
 			});
@@ -158,17 +167,48 @@ export class DodgerGame {
 
 		this.gameGrid.render();
 
-		const strawBerryInterval = setInterval(() => {
-			if (!this.gameState.gameOver && this.gameState.gameStarted) {
-				// generateLocations().map() to strawbery
+		setInterval(() => {
+			if (
+				!this.gameState.gameOver &&
+				this.gameState.gameStarted &&
+				this.gameGrid.strawberry.length < 1
+			) {
 				// add strawberry to gameGrid.strawberries
+				const strawberry = this.gameGrid
+					.generateLocations(1, [collisionPred, minDistPred])
+					.map((position) => {
+						return new Strawberry({
+							...Strawberry.default,
+							position
+						});
+					});
+
+				this.gameGrid.strawberry.push(...strawberry);
+
+				this.gameGrid.render();
 			}
-		}, 10000);
+		}, getRandomInt(2000, 5000));
 	}
 
 	checkIfStrawberryed(player: Player) {
 		// check if player is on a strawberry
-		// if it is, then make enemies run away from player
+		for (const [index, strawberry] of this.gameGrid.strawberry.entries()) {
+			if (collisionPred(player.position, strawberry.position)) {
+				// if it is, then make enemies run away from player
+				this.gameState.reversedEnemies = true;
+				this.gameState.strawberryTime += 30;
+				console.log("Enemies are running away from player");
+
+				// make strawberry disappear
+				while (this.gameGrid.strawberry.length > 0) {
+					this.gameGrid.strawberry.pop();
+					console.log("New strawberry removed");
+				}
+
+				// change score
+				// allow enemies to be cached (change enemies color???)
+			}
+		}
 	}
 
 	checkIfMushroomed(player: Player) {
@@ -199,13 +239,26 @@ export class DodgerGame {
 		for (const [index, enemy] of this.gameGrid.enemies.entries()) {
 			if (collisionPred(player.position, enemy.position)) {
 				console.log("ENEMY TOUCHED");
+				if (this.gameState.reversedEnemies) {
+					this.gameGrid.enemies.splice(index, 1);
+					this.gameState.score++;
+					this.displayScore();
+					break;
+				}
 				this.gameState.gameOver = true;
 			}
 		}
 	}
 
 	movePlayers() {
-		const allEntities = this.gameGrid.entities.flat();
+		const allEntities = this.gameState.reversedEnemies
+			? [
+					this.gameGrid.coins,
+					this.gameGrid.doors,
+					this.gameGrid.floors,
+					this.gameGrid.players
+			  ].flat()
+			: this.gameGrid.entities.flat();
 
 		const directionActions = {
 			left: (player: Player) => {
@@ -328,7 +381,7 @@ export class DodgerGame {
 			directionActions[moveDirection](player);
 			this.checkIfScored(player);
 			// this.checkIfMushroomed(player);
-			// this.checkIfStrawberryed(player);
+			this.checkIfStrawberryed(player);
 			player.controls.lastKeyPressed = null;
 		}
 	}
@@ -362,7 +415,10 @@ export class DodgerGame {
 			const [diffRow, diffColumn] = diffVec;
 			const allEntities = this.gameGrid.entities.flat();
 			const moveDistance = 1;
-			const direction = 1;
+			let direction = 1;
+			if (this.gameState.reversedEnemies) {
+				direction = -1;
+			}
 
 			enemy.move(([row, column]) => {
 				if (diffRow == 0 && diffColumn == 0) {
@@ -460,6 +516,13 @@ export class DodgerGame {
 		this.moveEnemies();
 		for (const player of this.gameGrid.players) {
 			this.checkIfDead(player);
+		}
+		if (this.gameState.strawberryTime > 0) {
+			this.gameState.strawberryTime--;
+		}
+
+		if (this.gameState.strawberryTime === 0) {
+			this.gameState.reversedEnemies = false;
 		}
 	}
 

@@ -202,6 +202,21 @@ export class Coin extends GridEntity {
 	}
 }
 
+export class Strawberry extends GridEntity {
+	static default = {
+		styles: ["bg-pink-800"],
+		lifetime: -1,
+		weight: 0,
+		blocking: false,
+		carryable: true,
+		speed: 0
+	};
+
+	constructor(args: GridEntityArgs) {
+		super({ ...args });
+	}
+}
+
 export class Mushroom extends GridEntity {
 	static default = {
 		styles: ["bg-yellow-500"],

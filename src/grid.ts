@@ -6,6 +6,7 @@ import {
 	Floor,
 	Player,
 	Stairs,
+	Strawberry,
 	Wall
 } from "./entities";
 import { BinaryPred, Bounds2D, Coord2D } from "./types";
@@ -16,6 +17,7 @@ export class GameGrid {
 	public players: Player[];
 	public enemies: Enemy[];
 	public coins: Coin[];
+	public strawberry: Strawberry[];
 	public walls: Wall[];
 	public floors: Floor[];
 	public doors: Door[];
@@ -27,6 +29,7 @@ export class GameGrid {
 		this.players = [];
 		this.enemies = [];
 		this.coins = [];
+		this.strawberry = [];
 		this.walls = [];
 		this.floors = [];
 		this.doors = [];
@@ -35,6 +38,7 @@ export class GameGrid {
 			this.players,
 			this.enemies,
 			this.coins,
+			this.strawberry,
 			this.walls,
 			this.floors,
 			this.doors,
@@ -68,6 +72,7 @@ export class GameGrid {
 		this.players = [];
 		this.enemies = [];
 		this.coins = [];
+		this.strawberry = [];
 		this.walls = [];
 		this.floors = [];
 		this.doors = [];
@@ -76,6 +81,7 @@ export class GameGrid {
 			this.players,
 			this.enemies,
 			this.coins,
+			this.strawberry,
 			this.walls,
 			this.floors,
 			this.doors,
