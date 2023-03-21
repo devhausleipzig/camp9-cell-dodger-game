@@ -1,6 +1,7 @@
 import { collisionPred } from "./game";
 import { Coord2D } from "./types";
 
+
 // abstract is a TypeScript only keyword
 // public & private are Typescript only keywords (you can create private members in JavaScript with '#')
 // in JavaScript, a class can only extend from/inherit from one other class
@@ -204,7 +205,7 @@ export class Coin extends GridEntity {
 
 export class Fire extends GridEntity {
 	static default = {
-		styles: ["bg-green-500"],
+		styles: ["bg-[url('/images/Fire.png')]", "bg-contain" ,"bg-no-repeat"],
 		lifetime: -1,
 		weight: 0,
 		blocking: false,
