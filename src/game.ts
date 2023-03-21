@@ -120,7 +120,7 @@ export class DodgerGame {
 		this.gameGrid.init();
 
 		const walls = this.gameGrid
-			.generateLocations(15, [collisionPred])
+			.generateLocations(5, [collisionPred])
 			.map((position) => {
 				return new Wall({ ...Wall.default, position });
 			});
@@ -344,6 +344,7 @@ export class DodgerGame {
 
 			directionActions[moveDirection](player);
 			this.checkIfScored(player);
+			this.checkIfFired(player);
 			// this.checkIfMushroomed(player);
 			// this.checkIfStrawberryed(player);
 			player.controls.lastKeyPressed = null;
