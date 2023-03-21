@@ -249,6 +249,7 @@ export class DodgerGame {
 			}
 		}
 	}
+	
 
 	movePlayers() {
 		const allEntities = this.gameState.reversedEnemies
