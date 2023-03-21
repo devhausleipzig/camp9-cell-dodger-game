@@ -94,10 +94,8 @@ export abstract class GridEntity implements Entity<Coord2D> {
 		}
 	}
 
-	public teleport(position: Coord2D, entityPositions: Coord2D[]): void {
-		if (!entityPositions.some(collisionPred.bind({}, position))) {
-			this._position = position;
-		}
+	public teleport(position: Coord2D): void {
+		this._position = position;
 	}
 }
 
@@ -179,7 +177,7 @@ export class Enemy extends DynamicGridEntity {
 		weight: 1000,
 		blocking: true,
 		carryable: false,
-		speed: 0.5
+		speed: 0.6
 	};
 
 	constructor(args: DynamicGridEntityArgs) {
@@ -190,6 +188,21 @@ export class Enemy extends DynamicGridEntity {
 }
 
 export class Coin extends GridEntity {
+	static default = {
+		styles: ["bg-yellow-500"],
+		lifetime: -1,
+		weight: 0,
+		blocking: false,
+		carryable: true,
+		speed: 0
+	};
+
+	constructor(args: GridEntityArgs) {
+		super({ ...args });
+	}
+}
+
+export class Mushroom extends GridEntity {
 	static default = {
 		styles: ["bg-yellow-500"],
 		lifetime: -1,
