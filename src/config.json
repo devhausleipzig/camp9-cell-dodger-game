@@ -5,18 +5,20 @@
 				"left": "ArrowLeft",
 				"up": "ArrowUp",
 				"right": "ArrowRight",
-				"down": "ArrowDown"
+				"down": "ArrowDown",
+				"teleport": "Space"
 			},
 			{
 				"left": "a",
 				"up": "w",
 				"right": "d",
-				"down": "s"
+				"down": "s",
+				"teleport": "ShiftLeft"
 			}
 		]
 	},
 	"game": {
-		"delay": 300,
+		"delay": 250,
 		"size": 20,
 		"numPlayers": 1,
 		"numEnemies": 5,

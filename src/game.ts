@@ -91,6 +91,7 @@ type GameState = {
 	numEnemies: number;
 	gameStarted: boolean;
 	gameOver: boolean;
+	// reversedEnemies: boolean;
 };
 
 export class DodgerGame {
@@ -106,7 +107,14 @@ export class DodgerGame {
 		this.gameGrid = new GameGrid(gameGridElement, gameParams.game.size);
 		this.settings = gameConfig;
 
+		// player1 controls hard coded here, should change it to be dynamic
 		document.addEventListener("keydown", (event) => {
+			// go through all the controls used by players
+			// and check if the key pressed matches any of them
+			if (!this.gameState.gameOver) {
+				this.gameState.gameStarted = true;
+			}
+
 			if (event.key === "ArrowLeft") {
 				this.gameGrid.players[0].controls.lastKeyPressed = "ArrowLeft";
 			} else if (event.key === "ArrowRight") {
@@ -115,9 +123,12 @@ export class DodgerGame {
 				this.gameGrid.players[0].controls.lastKeyPressed = "ArrowUp";
 			} else if (event.key === "ArrowDown") {
 				this.gameGrid.players[0].controls.lastKeyPressed = "ArrowDown";
+			} else if (event.key === "Space") {
+				this.gameGrid.players[0].controls.lastKeyPressed = "Space";
 			}
 		});
 
+		// this could be a class instance if we want to
 		this.gameState = {
 			score: 0,
 			delay: 300,
@@ -131,8 +142,6 @@ export class DodgerGame {
 	init() {
 		this.gameGrid.init();
 
-		let allEntities: Entity<Coord2D>[] = [];
-
 		const walls = this.gameGrid
 			.generateLocations(15, [collisionPred])
 			.map((position) => {
@@ -140,10 +149,9 @@ export class DodgerGame {
 			});
 
 		this.gameGrid.walls.push(...walls);
-		allEntities = this.gameGrid.entities.flat();
 
 		const players = this.gameGrid
-			.generateLocations(1, [collisionPred, minDistPred])
+			.generateLocations(1, [collisionPred])
 			.map((position) => {
 				return new Player({
 					...Player.default,
@@ -156,7 +164,6 @@ export class DodgerGame {
 			});
 
 		this.gameGrid.players.push(...players);
-		allEntities = this.gameGrid.entities.flat();
 
 		const enemies = this.gameGrid
 			.generateLocations(5, [collisionPred, minDistPred])
@@ -165,7 +172,6 @@ export class DodgerGame {
 			});
 
 		this.gameGrid.enemies.push(...enemies);
-		allEntities = this.gameGrid.entities.flat();
 
 		const coins = this.gameGrid
 			.generateLocations(2, [collisionPred, minDistPred])
@@ -175,6 +181,7 @@ export class DodgerGame {
 
 		this.gameGrid.coins.push(...coins);
 
+<<<<<<< HEAD
 		// generate Strawberry
 		const strawberry = this.gameGrid.generateLocations(
 			1,
@@ -182,6 +189,26 @@ export class DodgerGame {
 			return new Strawberry({ ...Strawberry.default, position });
 		});
 		this.gameGrid.coins.push(...strawberry);
+=======
+		this.gameGrid.render();
+
+		const strawBerryInterval = setInterval(() => {
+			if (!this.gameState.gameOver && this.gameState.gameStarted) {
+				// generateLocations().map() to strawbery
+				// add strawberry to gameGrid.strawberries
+			}
+		}, 10000);
+	}
+
+	checkIfStrawberryed(player: Player) {
+		// check if player is on a strawberry
+		// if it is, then make enemies run away from player
+	}
+
+	checkIfMushroomed(player: Player) {
+		// check if player is on a mushroom
+		// if it is, then decrease the game loop delay & decrease the enemy speed
+>>>>>>> main
 	}
 
 	checkIfScored(player: Player) {
@@ -304,6 +331,21 @@ export class DodgerGame {
 					return [row, column];
 				});
 			}
+			// teleport: (player: Player) => {
+			// 	const newLocation = [0, 0];
+
+			// 	const newLocationBlocked = allEntities.some((entity) => {
+			// 		if (entity.blocking) {
+			// 			return collisionPred(newLocation, entity.position);
+			// 		}
+
+			// 		return false;
+			// 	});
+
+			// 	if (!newLocationBlocked) {
+			// 		player.teleport(newLocation);
+			// 	}
+			// }
 		};
 
 		for (const player of this.gameGrid.players) {
@@ -314,12 +356,14 @@ export class DodgerGame {
 
 			type Directions = keyof typeof player.controls.movement;
 
-			const moveDirection = _.invert(Object(player.controls.movement))[
+			const moveDirection = _.invert(player.controls.movement)[
 				moveKey
 			] as Directions;
 
 			directionActions[moveDirection](player);
 			this.checkIfScored(player);
+			// this.checkIfMushroomed(player);
+			// this.checkIfStrawberryed(player);
 			player.controls.lastKeyPressed = null;
 		}
 	}
@@ -353,6 +397,7 @@ export class DodgerGame {
 			const [diffRow, diffColumn] = diffVec;
 			const allEntities = this.gameGrid.entities.flat();
 			const moveDistance = 1;
+			const direction = 1;
 
 			enemy.move(([row, column]) => {
 				if (diffRow == 0 && diffColumn == 0) {
@@ -363,7 +408,7 @@ export class DodgerGame {
 
 				const rowMove: Coord2D = [
 					mod(
-						row + Math.sign(diffRow) * moveDistance,
+						row + direction * Math.sign(diffRow) * moveDistance,
 						gameParams.game.size
 					),
 					column
@@ -372,7 +417,8 @@ export class DodgerGame {
 				const columnMove: Coord2D = [
 					row,
 					mod(
-						column + Math.sign(diffColumn) * moveDistance,
+						column +
+							direction * Math.sign(diffColumn) * moveDistance,
 						gameParams.game.size
 					)
 				];
@@ -408,7 +454,9 @@ export class DodgerGame {
 					ColumnGreater
 						? mod(
 								row +
-									Math.sign(diffRow) * moveDistance +
+									direction *
+										Math.sign(diffRow) *
+										moveDistance +
 									Math.sign(diffRow) * -2,
 								gameParams.game.size
 						  )
@@ -417,13 +465,15 @@ export class DodgerGame {
 						? column
 						: mod(
 								column +
-									Math.sign(diffColumn) * moveDistance +
+									direction *
+										Math.sign(diffColumn) *
+										moveDistance +
 									Math.sign(diffRow) * -2,
 								gameParams.game.size
 						  )
 				];
 
-				const laterMoveBlocked = allEntities.some((entity) => {
+				const lateralMoveBlocked = allEntities.some((entity) => {
 					if (entity.blocking) {
 						return collisionPred(lateralMove, entity.position);
 					}
@@ -431,7 +481,7 @@ export class DodgerGame {
 					return false;
 				});
 
-				if (!laterMoveBlocked) {
+				if (!lateralMoveBlocked) {
 					return lateralMove;
 				}
 

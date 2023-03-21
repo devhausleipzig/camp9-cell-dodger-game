@@ -95,10 +95,8 @@ export abstract class GridEntity implements Entity<Coord2D> {
 		}
 	}
 
-	public teleport(position: Coord2D, entityPositions: Coord2D[]): void {
-		if (!entityPositions.some(collisionPred.bind({}, position))) {
-			this._position = position;
-		}
+	public teleport(position: Coord2D): void {
+		this._position = position;
 	}
 }
 
@@ -180,7 +178,7 @@ export class Enemy extends DynamicGridEntity {
 		weight: 1000,
 		blocking: true,
 		carryable: false,
-		speed: 0.5
+		speed: 0.6
 	};
 
 	constructor(args: DynamicGridEntityArgs) {
@@ -205,11 +203,17 @@ export class Coin extends GridEntity {
 	}
 }
 
+<<<<<<< HEAD
 // 1. create a new Class Strawberry
 // 2. extend GridEntity
 export class Strawberry extends GridEntity {
 	static default = {
 		styles: ["bg-pink-500"],
+=======
+export class Mushroom extends GridEntity {
+	static default = {
+		styles: ["bg-yellow-500"],
+>>>>>>> main
 		lifetime: -1,
 		weight: 0,
 		blocking: false,
@@ -222,12 +226,15 @@ export class Strawberry extends GridEntity {
 	}
 }
 
+<<<<<<< HEAD
 // 4. check if any player has Strawberries
 // 	if yes,
 // 	4.1. invert the movement of the enemies
 // 	4.2 stop the following function
 // 	4.3
 
+=======
+>>>>>>> main
 export class Wall extends GridEntity {
 	static readonly default = {
 		styles: ["bg-black"],
